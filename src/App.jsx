@@ -13,15 +13,15 @@ import {
   serverTimestamp 
 } from "firebase/firestore";
 
-// --- CONFIGURACIÓN DE FIREBASE (Actualizada con los datos exactos de tu consola) ---
+// --- CONFIGURACIÓN DE FIREBASE (Corregida con los datos exactos y verídicos de tu consola) ---
 const firebaseConfig = {
-  apiKey: "AIzaSyBb_kK1woyNjAFXa35Eq8mOD02z_Dg44",
+  apiKey: "AIzaSyBb_kk1woNyxjAFXa35Eq8mOD02z_Dg44", // Corregido el token
   authDomain: "dnd-boutique.firebaseapp.com",
   projectId: "dnd-boutique",
-  storageBucket: "dnd-boutique.firebasestorage.app", // Actualizado a la nueva estructura de Firebase
-  messagingSenderId: "914932272449",
-  appId: "1:914932272449:web:097c1f4ecd868d5f4832d8",
-  measurementId: "G-0JR0PE1HYB" // Añadido desde tu consola de Firebase
+  storageBucket: "dnd-boutique.firebasestorage.app", 
+  messagingSenderId: "914932272649", // Corregido 2449 -> 2649
+  appId: "1:914932272649:web:097c1f4ecd868d5f4832d8", // Corregido 2449 -> 2649
+  measurementId: "G-0JR0PE1HYB" 
 };
 
 // Inicializar Firebase
@@ -108,9 +108,27 @@ export default function App() {
   // Seed combos iniciales por si la colección está vacía
   const seedCombos = async () => {    
     const defaults = [      
-      { nombre: "Combo Dúo", descripcion: "2 perfumes a elegir", precio: 25, stock: 15, activo: true },      
-      { nombre: "Combo Trío", descripcion: "3 perfumes a elegir", precio: 35, stock: 10, activo: true },      
-      { nombre: "Combo Premium", descripcion: "2 perfumes línea premium", precio: 45, stock: 8, activo: true },    
+      { 
+        nombre: "Combo 1 (1 Docena)", 
+        descripcion: "12 lociones Nevada de 100 ml + 1 Splash de regalo + Envío Gratis", 
+        precio: 42, 
+        stock: 50, 
+        activo: true 
+      },      
+      { 
+        nombre: "Combo 2 (2 Docenas)", 
+        descripcion: "24 lociones Nevada de 100 ml + 3 Splashes de regalo + Envío Gratis", 
+        precio: 84, 
+        stock: 30, 
+        activo: true 
+      },      
+      { 
+        nombre: "Combo Fragancias $39", 
+        descripcion: "2 Perfumes Dubai 100ml + 4 Nevada 100ml + 6 Lociones de 35ml + 1 Splash de regalo + Envío Gratis", 
+        precio: 39, 
+        stock: 25, 
+        activo: true 
+      },    
     ];    
     for (const combo of defaults) {      
       await addDoc(collection(db, "combos"), combo);    
