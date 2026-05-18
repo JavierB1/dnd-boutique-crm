@@ -158,8 +158,13 @@ export default function CRM() {
   const conversion = clients.length ? Math.round((clients.filter(c => c.status === "Cerrado").length / clients.length) * 100) : 0;
   const convList = Object.entries(conversations).map(([tel, conv]) => {
     const client = clients.find(c => c.telefono === `+${tel}` || c.id === tel);
-    return { telefono: tel, nombre: conv.nombre || client?.nombre || tel, ...conv };
-  });
+    let nombre = tel;
+    if (conv.nombre && typeof conv.nombre === 'string') nombre = conv.nombre;
+    else if (client?.nombre) nombre = client.nombre;
+    else if (conv.contacts && conv.contacts[0] && conv.contacts[0].profile) nombre = conv.contacts[0].profile.name;
+    const ultimoMsg = conv.ultimoMsg || (conv.messages && conv.messages[0] && conv.messages[0].text ? conv.messages[0].text.body : 'Sin mensajes');
+    return { telefono: tel, nombre: nombre || tel, ultimoMsg, botActivo: conv.botActivo !== undefined ? conv.botActivo : true, sinLeer: conv.sinLeer || 0, ultimoTiempo: conv.ultimoTiempo || '', mensajes: conv.mensajes || [] };
+  }).filter(conv => conv.telefono && conv.nombre);
 
   const navItems = [
     { id: "dashboard", icon: "⬡", label: "Dashboard" },
