@@ -23,6 +23,23 @@ const NAV = [
   { id:"pipeline",      icon:"◫", label:"Pipeline" },
 ];
 
+const PREFIJOS = [
+  { code:"+503", flag:"🇸🇻", name:"El Salvador" },
+  { code:"+502", flag:"🇬🇹", name:"Guatemala" },
+  { code:"+504", flag:"🇭🇳", name:"Honduras" },
+  { code:"+505", flag:"🇳🇮", name:"Nicaragua" },
+  { code:"+506", flag:"🇨🇷", name:"Costa Rica" },
+  { code:"+507", flag:"🇵🇦", name:"Panamá" },
+  { code:"+52",  flag:"🇲🇽", name:"México" },
+  { code:"+1",   flag:"🇺🇸", name:"EE.UU / Canadá" },
+  { code:"+57",  flag:"🇨🇴", name:"Colombia" },
+  { code:"+51",  flag:"🇵🇪", name:"Perú" },
+  { code:"+58",  flag:"🇻🇪", name:"Venezuela" },
+  { code:"+56",  flag:"🇨🇱", name:"Chile" },
+  { code:"+54",  flag:"🇦🇷", name:"Argentina" },
+  { code:"+34",  flag:"🇪🇸", name:"España" },
+];
+
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -33,9 +50,11 @@ const CSS = `
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   @keyframes spin{to{transform:rotate(360deg)}}
   @keyframes popIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
   .fade-up{animation:fadeUp .22s ease both;}
   .fade-in{animation:fadeIn .2s ease both;}
   .pop-in{animation:popIn .2s cubic-bezier(.34,1.56,.64,1) both;}
+  .shake{animation:shake .3s ease;}
   .nav-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:10px;cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);border:1px solid transparent;}
   .nav-item:hover{background:var(--bg3);color:var(--text);}
   .nav-item.active{background:linear-gradient(135deg,rgba(244,114,182,.12),rgba(167,139,250,.12));color:var(--accent);border-color:rgba(244,114,182,.2);font-weight:600;}
@@ -48,13 +67,16 @@ const CSS = `
   .btn-ghost:hover{color:var(--text);border-color:rgba(244,114,182,.3);}
   .btn-danger{background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.2);}
   .btn-danger:hover{background:rgba(239,68,68,.15);}
-  .btn-success{background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2);}
-  .btn-success:hover{background:rgba(52,211,153,.2);}
+  .btn-warning{background:rgba(245,158,11,.08);color:#fbbf24;border:1px solid rgba(245,158,11,.2);}
   .btn-sm{padding:5px 11px;font-size:11px;border-radius:7px;}
   .btn-icon{padding:7px;aspect-ratio:1;justify-content:center;}
   .input{background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;padding:9px 13px;color:var(--text);font-size:13px;font-family:Poppins,sans-serif;width:100%;transition:all .15s;outline:none;}
   .input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(244,114,182,.1);}
   .input::placeholder{color:var(--text3);}
+  .input-error{border-color:#ef4444!important;box-shadow:0 0 0 3px rgba(239,68,68,.1)!important;}
+  .phone-row{display:flex;gap:8px;}
+  .prefix-select{background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;padding:9px 10px;color:var(--text);font-size:13px;font-family:Poppins,sans-serif;transition:all .15s;outline:none;cursor:pointer;flex-shrink:0;width:150px;}
+  .prefix-select:focus{border-color:var(--accent);}
   .conv-item{padding:13px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s;position:relative;}
   .conv-item:hover{background:var(--bg3);}
   .conv-item.active{background:linear-gradient(135deg,rgba(244,114,182,.07),rgba(167,139,250,.07));}
@@ -63,6 +85,8 @@ const CSS = `
   .tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:300;backdrop-filter:blur(6px);padding:16px;animation:fadeIn .15s ease;}
   .modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:26px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:popIn .2s cubic-bezier(.34,1.56,.64,1);}
+  .alert-modal{max-width:360px;}
+  .notif{position:fixed;top:20px;right:20px;z-index:999;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,.4);display:flex;align-items:center;gap:10px;font-size:13px;animation:fadeUp .2s ease;min-width:260px;}
   select option{background:#1a1d27;}
   @media(max-width:768px){
     .desktop-sidebar{display:none!important;}
@@ -89,14 +113,23 @@ export default function App() {
   const [showAddCombo, setShowAddCombo] = useState(false);
   const [showEditCombo, setShowEditCombo] = useState(null);
   const [showNewChat, setShowNewChat] = useState(false);
+  const [showEditChat, setShowEditChat] = useState(false);
+  const [showDuplicateAlert, setShowDuplicateAlert] = useState(false);
   const [newClient, setNewClient] = useState({ nombre:"", telefono:"", status:"Nuevo", notas:"" });
   const [newCombo, setNewCombo] = useState({ nombre:"", descripcion:"", precio:"", stock:"" });
   const [editCombo, setEditCombo] = useState({ nombre:"", descripcion:"", precio:"", stock:"" });
-  const [newChatPhone, setNewChatPhone] = useState("");
+  const [newChatPrefijo, setNewChatPrefijo] = useState("+503");
+  const [newChatNumero, setNewChatNumero] = useState("");
+  const [newChatNombre, setNewChatNombre] = useState("");
   const [newChatMsg, setNewChatMsg] = useState("");
+  const [newChatError, setNewChatError] = useState("");
+  const [editChatData, setEditChatData] = useState({ nombre:"", notas:"", status:"Nuevo" });
+  const [searchConv, setSearchConv] = useState("");
+  const [notif, setNotif] = useState(null);
   const [loading, setLoading] = useState(true);
   const chatEndRef = useRef(null);
   const prevMsgCount = useRef({});
+  const notifTimer = useRef(null);
 
   useEffect(() => {
     const unsubs = [
@@ -112,16 +145,43 @@ export default function App() {
       onSnapshot(collection(db, "conversaciones"), snap => {
         const c = {};
         snap.docs.forEach(d => { c[d.id] = d.data(); });
-        setConversations(c);
+        setConversations(prev => {
+          // Detectar mensajes nuevos para notificación
+          Object.entries(c).forEach(([tel, conv]) => {
+            const prevConv = prev[tel];
+            const prevLen = prevConv?.mensajes?.length || 0;
+            const currLen = conv?.mensajes?.length || 0;
+            const lastMsg = conv?.mensajes?.[currLen - 1];
+            if (currLen > prevLen && lastMsg?.from === "client" && tel !== selectedPhone) {
+              showNotif(`📩 ${conv.nombre || tel}`, lastMsg.texto?.slice(0, 60));
+            }
+          });
+          return c;
+        });
       }),
     ];
     return () => unsubs.forEach(u => u());
+  }, [selectedPhone]);
+
+  // Notificaciones del navegador
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
   }, []);
 
-  // Auto-scroll al cambiar chat
+  const showNotif = (title, body) => {
+    setNotif({ title, body });
+    if (notifTimer.current) clearTimeout(notifTimer.current);
+    notifTimer.current = setTimeout(() => setNotif(null), 4000);
+    // Notificación nativa del navegador
+    if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
+      new Notification(title, { body, icon: "/favicon.ico" });
+    }
+  };
+
   useEffect(() => { scrollBottom("instant"); }, [selectedPhone]);
 
-  // Auto-scroll cuando llegan mensajes nuevos
   useEffect(() => {
     if (!selectedPhone) return;
     const curr = conversations[selectedPhone]?.mensajes?.length || 0;
@@ -132,7 +192,6 @@ export default function App() {
     }
   }, [conversations, selectedPhone]);
 
-  // Limpiar sinLeer al abrir chat
   useEffect(() => {
     if (!selectedPhone) return;
     const conv = conversations[selectedPhone];
@@ -152,17 +211,6 @@ export default function App() {
     ]) await addDoc(collection(db, "combos"), c);
   };
 
-  // Garantizar que el cliente existe en Firebase al recibir mensaje (estado Nuevo auto)
-  const ensureClient = async (telefono, nombre) => {
-    const existing = clients.find(c => c.telefono === telefono || c.telefono === `+${telefono}`);
-    if (!existing) {
-      await addDoc(collection(db, "clientes"), {
-        nombre: nombre || telefono, telefono,
-        status:"Nuevo", totalGastado:0, notas:"", createdAt:serverTimestamp()
-      });
-    }
-  };
-
   const addCombo = async () => {
     if (!newCombo.nombre) return;
     await addDoc(collection(db, "combos"), {
@@ -176,10 +224,8 @@ export default function App() {
   const saveEditCombo = async () => {
     if (!showEditCombo) return;
     await updateDoc(doc(db, "combos", showEditCombo), {
-      nombre: editCombo.nombre,
-      descripcion: editCombo.descripcion,
-      precio: parseFloat(editCombo.precio)||0,
-      stock: parseInt(editCombo.stock)||0,
+      nombre: editCombo.nombre, descripcion: editCombo.descripcion,
+      precio: parseFloat(editCombo.precio)||0, stock: parseInt(editCombo.stock)||0,
     });
     setShowEditCombo(null);
   };
@@ -199,7 +245,6 @@ export default function App() {
     const tiempo = new Date().toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
     const conv = conversations[selectedPhone] || { mensajes:[] };
     const msgs = conv.mensajes || [];
-    // Anti-duplicado: no guardar si el último mensaje es igual
     const ultimo = msgs[msgs.length-1];
     if (ultimo?.from === "user" && ultimo?.texto === texto) { setNewMsg(""); return; }
     const mensajes = [...msgs, { from:"user", texto, tiempo }];
@@ -216,13 +261,40 @@ export default function App() {
   };
 
   const iniciarChat = async () => {
-    const tel = newChatPhone.replace(/\D/g,"");
-    if (!tel || !newChatMsg.trim()) return;
+    setNewChatError("");
+    // Validar número
+    const numLimpio = newChatNumero.replace(/\D/g,"");
+    if (!numLimpio) { setNewChatError("Ingresa un número válido"); return; }
+    if (numLimpio.length < 7) { setNewChatError("El número es demasiado corto"); return; }
+    if (!newChatMsg.trim()) { setNewChatError("Escribe un mensaje para iniciar"); return; }
+
+    // Construir teléfono completo sin el +
+    const prefijoNum = newChatPrefijo.replace("+","");
+    const tel = `${prefijoNum}${numLimpio}`;
+
+    // Verificar duplicado
+    const existe = conversations[tel] || conversations[`+${tel}`];
+    if (existe) {
+      setShowDuplicateAlert(true);
+      return;
+    }
+
+    const nombre = newChatNombre.trim() || tel;
     const tiempo = new Date().toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
     await setDoc(doc(db, "conversaciones", tel), {
-      nombre:tel, mensajes:[{ from:"user", texto:newChatMsg, tiempo }],
+      nombre, mensajes:[{ from:"user", texto:newChatMsg, tiempo }],
       ultimoMsg:newChatMsg, ultimoTiempo:tiempo, botActivo:false, sinLeer:0
     }, { merge:true });
+
+    // Crear cliente automáticamente
+    const clienteExiste = clients.find(c => c.telefono===tel || c.telefono===`+${tel}`);
+    if (!clienteExiste && nombre) {
+      await addDoc(collection(db, "clientes"), {
+        nombre, telefono:tel, status:"Nuevo",
+        totalGastado:0, notas:"", createdAt:serverTimestamp()
+      });
+    }
+
     try {
       await fetch(`${BACKEND}/api/enviar`, {
         method:"POST", headers:{ "Content-Type":"application/json" },
@@ -232,7 +304,35 @@ export default function App() {
     setSelectedPhone(tel);
     setSection("conversations");
     setShowNewChat(false);
-    setNewChatPhone(""); setNewChatMsg("");
+    setNewChatNumero(""); setNewChatNombre(""); setNewChatMsg(""); setNewChatPrefijo("+503");
+  };
+
+  const abrirEditChat = () => {
+    if (!selectedPhone) return;
+    const conv = conversations[selectedPhone] || {};
+    const cliente = clients.find(c => c.telefono===selectedPhone || c.telefono===`+${selectedPhone}`);
+    setEditChatData({
+      nombre: conv.nombre || selectedPhone,
+      notas: cliente?.notas || "",
+      status: cliente?.status || "Nuevo",
+    });
+    setShowEditChat(true);
+  };
+
+  const guardarEditChat = async () => {
+    if (!selectedPhone) return;
+    // Actualizar nombre en conversación
+    await setDoc(doc(db, "conversaciones", selectedPhone), { nombre: editChatData.nombre }, { merge:true });
+    // Actualizar cliente si existe
+    const cliente = clients.find(c => c.telefono===selectedPhone || c.telefono===`+${selectedPhone}`);
+    if (cliente) {
+      await updateDoc(doc(db, "clientes", cliente.id), {
+        nombre: editChatData.nombre,
+        notas: editChatData.notas,
+        status: editChatData.status,
+      });
+    }
+    setShowEditChat(false);
   };
 
   const toggleBot = async (tel) => {
@@ -247,7 +347,6 @@ export default function App() {
     } catch(e) {}
   };
 
-  // sinLeer = número de CHATS con mensajes pendientes (no cantidad de mensajes)
   const chatsUnread = Object.values(conversations).filter(c => (c.sinLeer||0) > 0).length;
   const totalVentas = clients.filter(c=>c.status==="Cerrado").reduce((a,c)=>a+(c.totalGastado||0),0);
   const conversion = clients.length ? Math.round(clients.filter(c=>c.status==="Cerrado").length/clients.length*100) : 0;
@@ -261,6 +360,11 @@ export default function App() {
       ultimoTiempo:conv.ultimoTiempo||"",
       mensajes:conv.mensajes||[],
     }))
+    .filter(c => {
+      if (!searchConv) return true;
+      const q = searchConv.toLowerCase();
+      return c.nombre.toLowerCase().includes(q) || c.telefono.includes(q) || c.ultimoMsg.toLowerCase().includes(q);
+    })
     .sort((a,b) => b.sinLeer - a.sinLeer);
 
   const theme = {
@@ -285,27 +389,131 @@ export default function App() {
     chatsUnread,showAddClient,setShowAddClient,showAddCombo,setShowAddCombo,
     showEditCombo,setShowEditCombo,editCombo,setEditCombo,saveEditCombo,
     showNewChat,setShowNewChat,newClient,setNewClient,newCombo,setNewCombo,
-    newChatPhone,setNewChatPhone,newChatMsg,setNewChatMsg,
     addCombo,addClient,updateClientStatus,setCombos,db,dark,scrollBottom,
-    ensureClient,
+    searchConv,setSearchConv,abrirEditChat,
   };
 
   return (
     <div style={{ ...theme,display:"flex",height:"100vh",background:"var(--bg)",fontFamily:"'Poppins',sans-serif",color:"var(--text)",overflow:"hidden" }}>
       <style>{CSS}</style>
 
+      {/* Notificación flotante */}
+      {notif && (
+        <div className="notif" style={{ fontFamily:"Poppins,sans-serif" }}>
+          <span style={{ fontSize:20 }}>📩</span>
+          <div>
+            <div style={{ fontWeight:700,fontSize:13 }}>{notif.title}</div>
+            <div style={{ fontSize:12,color:"var(--text3)",marginTop:2 }}>{notif.body}</div>
+          </div>
+          <button onClick={()=>setNotif(null)} style={{ marginLeft:"auto",background:"none",border:"none",cursor:"pointer",color:"var(--text3)",fontSize:16 }}>✕</button>
+        </div>
+      )}
+
       {/* Modal nueva conversación */}
       {showNewChat && (
-        <div className="modal-overlay" onClick={()=>setShowNewChat(false)}>
+        <div className="modal-overlay" onClick={()=>{setShowNewChat(false);setNewChatError("");}}>
           <div className="modal" onClick={e=>e.stopPropagation()}>
             <h3 style={{ fontSize:16,fontWeight:700,marginBottom:6 }}>Nueva conversación</h3>
-            <p style={{ fontSize:12,color:"var(--text3)",marginBottom:20 }}>Inicia un chat enviando el primer mensaje</p>
+            <p style={{ fontSize:12,color:"var(--text3)",marginBottom:20 }}>Completa los datos para iniciar el chat</p>
             <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
-              <input className="input" placeholder="Número WhatsApp (ej: 50372345678)" value={newChatPhone} onChange={e=>setNewChatPhone(e.target.value)} />
-              <textarea className="input" placeholder="Mensaje inicial..." rows={3} style={{ resize:"none" }} value={newChatMsg} onChange={e=>setNewChatMsg(e.target.value)} />
+              <input className="input" placeholder="Nombre del contacto (opcional)"
+                value={newChatNombre} onChange={e=>setNewChatNombre(e.target.value)} />
+              <div className="phone-row">
+                <select className="prefix-select" value={newChatPrefijo} onChange={e=>setNewChatPrefijo(e.target.value)}>
+                  {PREFIJOS.map(p => (
+                    <option key={p.code} value={p.code}>{p.flag} {p.code} {p.name}</option>
+                  ))}
+                </select>
+                <input className={`input ${newChatError&&!newChatNumero?"input-error":""}`}
+                  placeholder="Número (sin prefijo)"
+                  value={newChatNumero}
+                  onChange={e=>setNewChatNumero(e.target.value.replace(/\D/g,""))}
+                  style={{ flex:1 }} />
+              </div>
+              {newChatNumero && (
+                <div style={{ fontSize:11,color:"var(--text3)",padding:"6px 12px",background:"var(--bg3)",borderRadius:8 }}>
+                  📱 Número completo: <strong style={{ color:"var(--accent)" }}>+{newChatPrefijo.replace("+","")}{newChatNumero}</strong>
+                </div>
+              )}
+              <textarea className={`input ${newChatError&&!newChatMsg.trim()?"input-error":""}`}
+                placeholder="Mensaje inicial..." rows={3} style={{ resize:"none" }}
+                value={newChatMsg} onChange={e=>setNewChatMsg(e.target.value)} />
+              {newChatError && (
+                <div style={{ fontSize:12,color:"#f87171",padding:"8px 12px",background:"rgba(239,68,68,.08)",borderRadius:8,border:"1px solid rgba(239,68,68,.2)" }}>
+                  ⚠️ {newChatError}
+                </div>
+              )}
               <div style={{ display:"flex",gap:10,marginTop:4 }}>
-                <button className="btn btn-ghost" style={{ flex:1 }} onClick={()=>setShowNewChat(false)}>Cancelar</button>
+                <button className="btn btn-ghost" style={{ flex:1 }} onClick={()=>{setShowNewChat(false);setNewChatError("");}}>Cancelar</button>
                 <button className="btn btn-primary" style={{ flex:1 }} onClick={iniciarChat}>Enviar →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal número duplicado */}
+      {showDuplicateAlert && (
+        <div className="modal-overlay" onClick={()=>setShowDuplicateAlert(false)}>
+          <div className="modal alert-modal" onClick={e=>e.stopPropagation()}>
+            <div style={{ textAlign:"center",marginBottom:16 }}>
+              <div style={{ fontSize:36,marginBottom:8 }}>⚠️</div>
+              <h3 style={{ fontSize:16,fontWeight:700,marginBottom:6 }}>Número ya existe</h3>
+              <p style={{ fontSize:13,color:"var(--text3)",lineHeight:1.6 }}>
+                Ya existe una conversación con el número <strong style={{ color:"var(--accent)" }}>+{newChatPrefijo.replace("+","")}{newChatNumero}</strong>. Búscala en la lista de chats.
+              </p>
+            </div>
+            <button className="btn btn-primary" style={{ width:"100%",justifyContent:"center" }}
+              onClick={()=>{
+                setShowDuplicateAlert(false);
+                setShowNewChat(false);
+                setSection("conversations");
+                const tel = `${newChatPrefijo.replace("+","")}${newChatNumero}`;
+                setSelectedPhone(tel);
+              }}>
+              Ir al chat →
+            </button>
+            <button className="btn btn-ghost" style={{ width:"100%",justifyContent:"center",marginTop:8 }}
+              onClick={()=>setShowDuplicateAlert(false)}>
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal editar chat */}
+      {showEditChat && (
+        <div className="modal-overlay" onClick={()=>setShowEditChat(false)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <h3 style={{ fontSize:16,fontWeight:700,marginBottom:6 }}>Editar conversación</h3>
+            <p style={{ fontSize:12,color:"var(--text3)",marginBottom:20 }}>El número no puede modificarse</p>
+            <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
+              <div>
+                <label style={{ fontSize:11,color:"var(--text3)",fontWeight:600,display:"block",marginBottom:6 }}>NOMBRE</label>
+                <input className="input" placeholder="Nombre del contacto"
+                  value={editChatData.nombre} onChange={e=>setEditChatData({...editChatData,nombre:e.target.value})} />
+              </div>
+              <div>
+                <label style={{ fontSize:11,color:"var(--text3)",fontWeight:600,display:"block",marginBottom:6 }}>NÚMERO</label>
+                <input className="input" value={selectedPhone} disabled
+                  style={{ opacity:.5,cursor:"not-allowed" }} />
+              </div>
+              <div>
+                <label style={{ fontSize:11,color:"var(--text3)",fontWeight:600,display:"block",marginBottom:6 }}>ESTADO</label>
+                <select className="input" value={editChatData.status}
+                  onChange={e=>setEditChatData({...editChatData,status:e.target.value})}>
+                  {STATUSES.map(s=><option key={s}>{s}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize:11,color:"var(--text3)",fontWeight:600,display:"block",marginBottom:6 }}>NOTAS</label>
+                <textarea className="input" placeholder="Notas sobre este cliente..." rows={3}
+                  style={{ resize:"none" }} value={editChatData.notas}
+                  onChange={e=>setEditChatData({...editChatData,notas:e.target.value})} />
+              </div>
+              <div style={{ display:"flex",gap:10,marginTop:4 }}>
+                <button className="btn btn-ghost" style={{ flex:1 }} onClick={()=>setShowEditChat(false)}>Cancelar</button>
+                <button className="btn btn-primary" style={{ flex:1 }} onClick={guardarEditChat}>Guardar</button>
               </div>
             </div>
           </div>
@@ -372,7 +580,7 @@ export default function App() {
         </header>
         <main style={{ flex:1,overflow:"auto",padding:section==="conversations"?0:"24px" }} className="fade-up">
           {section==="dashboard"     && <Dashboard {...shared} />}
-          {section==="conversations" && <Conversations {...shared} />}
+          {section==="conversations" && <Conversations {...shared} showEditChat={showEditChat} setShowEditChat={setShowEditChat} abrirEditChat={abrirEditChat} />}
           {section==="clients"       && <Clients {...shared} />}
           {section==="combos"        && <Combos {...shared} />}
           {section==="pipeline"      && <Pipeline {...shared} />}
@@ -401,17 +609,16 @@ export default function App() {
   );
 }
 
-// ─── DASHBOARD ───────────────────────────────────────────────────
 function Dashboard({ clients, combos, totalVentas, conversion, chatsUnread }) {
   return (
     <div style={{ maxWidth:900 }}>
       <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(175px,1fr))",gap:12,marginBottom:20 }}>
         {[
-          { label:"Clientes",      value:clients.length,                                    icon:"◈", color:"var(--accent)" },
-          { label:"Ventas cerradas",value:clients.filter(c=>c.status==="Cerrado").length,   icon:"✓", color:"var(--accent3)" },
-          { label:"Ingresos",      value:`$${totalVentas}`,                                 icon:"$", color:"#fbbf24" },
-          { label:"Conversión",    value:`${conversion}%`,                                  icon:"↑", color:"var(--accent2)" },
-          { label:"Chats sin leer",value:chatsUnread,                                       icon:"◎", color:"var(--accent)" },
+          { label:"Clientes",       value:clients.length,                                  icon:"◈", color:"var(--accent)" },
+          { label:"Ventas cerradas",value:clients.filter(c=>c.status==="Cerrado").length,  icon:"✓", color:"var(--accent3)" },
+          { label:"Ingresos",       value:`$${totalVentas}`,                               icon:"$", color:"#fbbf24" },
+          { label:"Conversión",     value:`${conversion}%`,                                icon:"↑", color:"var(--accent2)" },
+          { label:"Chats sin leer", value:chatsUnread,                                     icon:"◎", color:"var(--accent)" },
         ].map((s,i) => (
           <div key={i} className="card fade-up" style={{ padding:"18px 20px",animationDelay:`${i*.05}s` }}>
             <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12 }}>
@@ -464,11 +671,8 @@ function Dashboard({ clients, combos, totalVentas, conversion, chatsUnread }) {
   );
 }
 
-// ─── CONVERSACIONES ──────────────────────────────────────────────
-function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,newMsg,setNewMsg,enviarMensaje,toggleBot,chatEndRef,db,dark,scrollBottom,clients,updateClientStatus }) {
+function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,newMsg,setNewMsg,enviarMensaje,toggleBot,chatEndRef,db,dark,scrollBottom,clients,updateClientStatus,searchConv,setSearchConv,abrirEditChat }) {
   const conv = selectedPhone?(conversations[selectedPhone]||{mensajes:[],botActivo:true}):null;
-
-  // Encontrar cliente relacionado al chat seleccionado
   const clienteRelacionado = selectedPhone
     ? clients.find(c => c.telefono===selectedPhone || c.telefono===`+${selectedPhone}`)
     : null;
@@ -476,13 +680,15 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
   const ChatList = (
     <div style={{ display:"flex",flexDirection:"column",height:"100%",background:"var(--bg2)",borderRight:"1px solid var(--border)" }}>
       <div style={{ padding:"12px 14px",borderBottom:"1px solid var(--border)",flexShrink:0 }}>
-        <input className="input" placeholder="Buscar conversación..." style={{ fontSize:12 }} />
+        <input className="input" placeholder="Buscar conversación..."
+          style={{ fontSize:12 }} value={searchConv}
+          onChange={e=>setSearchConv(e.target.value)} />
       </div>
       <div style={{ flex:1,overflowY:"auto" }}>
         {convList.length===0 && (
           <div style={{ textAlign:"center",padding:"60px 20px",color:"var(--text3)" }}>
             <div style={{ fontSize:36,marginBottom:10,opacity:.4 }}>◎</div>
-            <div style={{ fontSize:13 }}>Los mensajes aparecerán aquí</div>
+            <div style={{ fontSize:13 }}>{searchConv?"Sin resultados":"Los mensajes aparecerán aquí"}</div>
           </div>
         )}
         {convList.map(c => (
@@ -513,7 +719,6 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
 
   const ChatArea = conv ? (
     <div style={{ flex:1,display:"flex",flexDirection:"column",minWidth:0 }}>
-      {/* Header chat */}
       <div style={{ padding:"12px 20px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",justifyContent:"space-between",background:"var(--bg2)",flexShrink:0 }}>
         <div style={{ display:"flex",alignItems:"center",gap:11 }}>
           <div style={{ width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,var(--accent),var(--accent2))",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,color:"white",fontSize:14 }}>
@@ -523,13 +728,13 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
             <div style={{ fontSize:14,fontWeight:600 }}>{conv.nombre||selectedPhone}</div>
             <div style={{ fontSize:10,color:"var(--text3)" }}>+{selectedPhone}</div>
           </div>
+          {/* Botón editar chat */}
+          <button className="btn btn-ghost btn-icon btn-sm" onClick={abrirEditChat} title="Editar contacto"
+            style={{ marginLeft:4 }}>✎</button>
         </div>
         <div style={{ display:"flex",gap:8,alignItems:"center",flexWrap:"wrap" }}>
-          {/* Estado del cliente con selector inline */}
           {clienteRelacionado && (
-            <select
-              className="input"
-              value={clienteRelacionado.status||"Nuevo"}
+            <select className="input" value={clienteRelacionado.status||"Nuevo"}
               style={{ width:130,fontSize:11,padding:"4px 10px",height:"auto",
                 background:STATUS_META[clienteRelacionado.status||"Nuevo"].bg,
                 color:STATUS_META[clienteRelacionado.status||"Nuevo"].text,
@@ -550,7 +755,6 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
         </div>
       </div>
 
-      {/* Mensajes */}
       <div style={{ flex:1,overflowY:"auto",padding:"20px",display:"flex",flexDirection:"column",gap:10,background:"var(--bg)" }}>
         {(conv.mensajes||[]).length===0 && (
           <div style={{ textAlign:"center",color:"var(--text3)",marginTop:60,fontSize:13 }}>Sin mensajes aún</div>
@@ -573,7 +777,6 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
         <div ref={chatEndRef} style={{ height:1 }} />
       </div>
 
-      {/* Input */}
       <div style={{ padding:"12px 20px",borderTop:"1px solid var(--border)",display:"flex",gap:10,background:"var(--bg2)",flexShrink:0 }}>
         <input className="input" value={newMsg} onChange={e=>setNewMsg(e.target.value)}
           onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&(e.preventDefault(),enviarMensaje())}
@@ -596,7 +799,6 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
   );
 }
 
-// ─── CLIENTES ────────────────────────────────────────────────────
 function Clients({ clients,showAddClient,setShowAddClient,newClient,setNewClient,addClient,updateClientStatus }) {
   const [search,setSearch] = useState("");
   const filtered = clients.filter(c=>
@@ -619,6 +821,7 @@ function Clients({ clients,showAddClient,setShowAddClient,newClient,setNewClient
               <div style={{ flex:1,minWidth:120 }}>
                 <div style={{ fontSize:13,fontWeight:600 }}>{client.nombre}</div>
                 <div style={{ fontSize:11,color:"var(--text3)" }}>{client.telefono}</div>
+                {client.notas && <div style={{ fontSize:11,color:"var(--text3)",marginTop:2,fontStyle:"italic" }}>📝 {client.notas.slice(0,60)}</div>}
               </div>
               <div style={{ display:"flex",alignItems:"center",gap:10,flexWrap:"wrap" }}>
                 {client.totalGastado>0 && <span style={{ fontSize:14,fontWeight:800,color:"var(--accent3)" }}>${client.totalGastado}</span>}
@@ -655,7 +858,6 @@ function Clients({ clients,showAddClient,setShowAddClient,newClient,setNewClient
   );
 }
 
-// ─── COMBOS ──────────────────────────────────────────────────────
 function Combos({ combos,showAddCombo,setShowAddCombo,showEditCombo,setShowEditCombo,editCombo,setEditCombo,saveEditCombo,newCombo,setNewCombo,addCombo,db }) {
   return (
     <div style={{ maxWidth:900 }}>
@@ -667,15 +869,14 @@ function Combos({ combos,showAddCombo,setShowAddCombo,showEditCombo,setShowEditC
         {combos.map((combo,i) => (
           <div key={combo.id} className="card fade-up" style={{ padding:20,opacity:combo.activo?1:.55,animationDelay:`${i*.05}s` }}>
             <div style={{ display:"flex",justifyContent:"space-between",marginBottom:14 }}>
-              <span style={{ fontSize:11,fontWeight:700,letterSpacing:".5px",padding:"3px 10px",borderRadius:20,
+              <span style={{ fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:20,
                 background:combo.activo?"rgba(52,211,153,.1)":"var(--bg3)",
                 color:combo.activo?"var(--accent3)":"var(--text3)" }}>
                 {combo.activo?"ACTIVO":"INACTIVO"}
               </span>
               <div style={{ display:"flex",gap:6 }}>
-                {/* Botón editar */}
                 <button className="btn btn-ghost btn-icon btn-sm" onClick={()=>{
-                  setEditCombo({ nombre:combo.nombre, descripcion:combo.descripcion, precio:combo.precio, stock:combo.stock });
+                  setEditCombo({ nombre:combo.nombre,descripcion:combo.descripcion,precio:combo.precio,stock:combo.stock });
                   setShowEditCombo(combo.id);
                 }}>✎</button>
                 <button className="btn btn-danger btn-icon btn-sm" onClick={()=>deleteDoc(doc(db,"combos",combo.id))}>✕</button>
@@ -715,7 +916,6 @@ function Combos({ combos,showAddCombo,setShowAddCombo,showEditCombo,setShowEditC
   );
 }
 
-// ─── PIPELINE ────────────────────────────────────────────────────
 function Pipeline({ clients,updateClientStatus }) {
   return (
     <div>
@@ -741,8 +941,8 @@ function Pipeline({ clients,updateClientStatus }) {
                       <span style={{ fontSize:12,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{client.nombre}</span>
                     </div>
                     <div style={{ fontSize:10,color:"var(--text3)" }}>{client.telefono}</div>
+                    {client.notas && <div style={{ fontSize:10,color:"var(--text3)",marginTop:3,fontStyle:"italic" }}>📝 {client.notas.slice(0,40)}</div>}
                     {client.totalGastado>0 && <div style={{ fontSize:13,fontWeight:800,color:"var(--accent3)",marginTop:6 }}>${client.totalGastado}</div>}
-                    {/* Cambiar estado desde pipeline */}
                     <select className="input" value={client.status||"Nuevo"} style={{ width:"100%",fontSize:11,marginTop:8,padding:"4px 8px" }}
                       onChange={e=>updateClientStatus(client.id,e.target.value)}>
                       {STATUSES.map(s=><option key={s}>{s}</option>)}
