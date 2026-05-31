@@ -131,6 +131,15 @@ export default function App() {
   const prevMsgCount = useRef({});
   const notifTimer = useRef(null);
 
+  // Helper para resetear campos de nueva chat
+  const resetNewChatFields = () => {
+    setNewChatNumero("");
+    setNewChatNombre("");
+    setNewChatMsg("");
+    setNewChatPrefijo("+503");
+    setNewChatError("");
+  };
+
   useEffect(() => {
     const unsubs = [
       onSnapshot(collection(db, "combos"), snap => {
@@ -146,7 +155,6 @@ export default function App() {
         const c = {};
         snap.docs.forEach(d => { c[d.id] = d.data(); });
         setConversations(prev => {
-          // Detectar mensajes nuevos para notificación
           Object.entries(c).forEach(([tel, conv]) => {
             const prevConv = prev[tel];
             const prevLen = prevConv?.mensajes?.length || 0;
@@ -163,7 +171,6 @@ export default function App() {
     return () => unsubs.forEach(u => u());
   }, [selectedPhone]);
 
-  // Notificaciones del navegador
   useEffect(() => {
     if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission();
@@ -174,7 +181,6 @@ export default function App() {
     setNotif({ title, body });
     if (notifTimer.current) clearTimeout(notifTimer.current);
     notifTimer.current = setTimeout(() => setNotif(null), 4000);
-    // Notificación nativa del navegador
     if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
       new Notification(title, { body, icon: "/favicon.ico" });
     }
@@ -262,17 +268,14 @@ export default function App() {
 
   const iniciarChat = async () => {
     setNewChatError("");
-    // Validar número
     const numLimpio = newChatNumero.replace(/\D/g,"");
     if (!numLimpio) { setNewChatError("Ingresa un número válido"); return; }
     if (numLimpio.length < 7) { setNewChatError("El número es demasiado corto"); return; }
     if (!newChatMsg.trim()) { setNewChatError("Escribe un mensaje para iniciar"); return; }
 
-    // Construir teléfono completo sin el +
     const prefijoNum = newChatPrefijo.replace("+","");
     const tel = `${prefijoNum}${numLimpio}`;
 
-    // Verificar duplicado
     const existe = conversations[tel] || conversations[`+${tel}`];
     if (existe) {
       setShowDuplicateAlert(true);
@@ -286,7 +289,6 @@ export default function App() {
       ultimoMsg:newChatMsg, ultimoTiempo:tiempo, botActivo:false, sinLeer:0
     }, { merge:true });
 
-    // Crear cliente automáticamente
     const clienteExiste = clients.find(c => c.telefono===tel || c.telefono===`+${tel}`);
     if (!clienteExiste && nombre) {
       await addDoc(collection(db, "clientes"), {
@@ -303,8 +305,10 @@ export default function App() {
     } catch(e) {}
     setSelectedPhone(tel);
     setSection("conversations");
+    
+    // Reset and Close
+    resetNewChatFields();
     setShowNewChat(false);
-    setNewChatNumero(""); setNewChatNombre(""); setNewChatMsg(""); setNewChatPrefijo("+503");
   };
 
   const abrirEditChat = () => {
@@ -321,9 +325,7 @@ export default function App() {
 
   const guardarEditChat = async () => {
     if (!selectedPhone) return;
-    // Actualizar nombre en conversación
     await setDoc(doc(db, "conversaciones", selectedPhone), { nombre: editChatData.nombre }, { merge:true });
-    // Actualizar cliente si existe
     const cliente = clients.find(c => c.telefono===selectedPhone || c.telefono===`+${selectedPhone}`);
     if (cliente) {
       await updateDoc(doc(db, "clientes", cliente.id), {
@@ -411,7 +413,7 @@ export default function App() {
 
       {/* Modal nueva conversación */}
       {showNewChat && (
-        <div className="modal-overlay" onClick={()=>{setShowNewChat(false);setNewChatError("");}}>
+        <div className="modal-overlay" onClick={()=>{setShowNewChat(false); resetNewChatFields();}}>
           <div className="modal" onClick={e=>e.stopPropagation()}>
             <h3 style={{ fontSize:16,fontWeight:700,marginBottom:6 }}>Nueva conversación</h3>
             <p style={{ fontSize:12,color:"var(--text3)",marginBottom:20 }}>Completa los datos para iniciar el chat</p>
@@ -444,7 +446,7 @@ export default function App() {
                 </div>
               )}
               <div style={{ display:"flex",gap:10,marginTop:4 }}>
-                <button className="btn btn-ghost" style={{ flex:1 }} onClick={()=>{setShowNewChat(false);setNewChatError("");}}>Cancelar</button>
+                <button className="btn btn-ghost" style={{ flex:1 }} onClick={()=>{setShowNewChat(false); resetNewChatFields();}}>Cancelar</button>
                 <button className="btn btn-primary" style={{ flex:1 }} onClick={iniciarChat}>Enviar →</button>
               </div>
             </div>
@@ -467,6 +469,7 @@ export default function App() {
               onClick={()=>{
                 setShowDuplicateAlert(false);
                 setShowNewChat(false);
+                resetNewChatFields();
                 setSection("conversations");
                 const tel = `${newChatPrefijo.replace("+","")}${newChatNumero}`;
                 setSelectedPhone(tel);
@@ -728,7 +731,6 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
             <div style={{ fontSize:14,fontWeight:600 }}>{conv.nombre||selectedPhone}</div>
             <div style={{ fontSize:10,color:"var(--text3)" }}>+{selectedPhone}</div>
           </div>
-          {/* Botón editar chat */}
           <button className="btn btn-ghost btn-icon btn-sm" onClick={abrirEditChat} title="Editar contacto"
             style={{ marginLeft:4 }}>✎</button>
         </div>
