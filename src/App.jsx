@@ -310,9 +310,10 @@ export default function App() {
 
     const nombre = newChatNombre.trim() || tel;
     const tiempo = new Date().toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
+    
     await setDoc(doc(db, "conversaciones", tel), {
       nombre, mensajes:[{ from:"user", texto:newChatMsg, tiempo }],
-      ultimoMsg:newChatMsg, ultimoTiempo:tiempo, botActivo:false, sinLeer:0
+      ultimoMsg:newChatMsg, ultimoTiempo:tiempo, botActivo:true, sinLeer:0
     }, { merge:true });
 
     const clienteExiste = clients.find(c => c.telefono===tel || c.telefono===`+${tel}`);
