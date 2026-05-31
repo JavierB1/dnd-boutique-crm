@@ -8,11 +8,11 @@ import {
 const BACKEND = "https://dnd-boutique-backend-production.up.railway.app";
 
 const STATUS_META = {
-  "Nuevo":      { bg:"rgba(59,130,246,.12)",  text:"#60a5fa", dot:"#3b82f6" },
-  "Interesado": { bg:"rgba(245,158,11,.12)",  text:"#fbbf24", dot:"#f59e0b" },
-  "Cotizado":   { bg:"rgba(139,92,246,.12)",  text:"#a78bfa", dot:"#8b5cf6" },
-  "Cerrado":    { bg:"rgba(52,211,153,.12)",  text:"#34d399", dot:"#10b981" },
-  "Perdido":    { bg:"rgba(239,68,68,.12)",   text:"#f87171", dot:"#ef4444" },
+  "Nuevo":      { bg:"rgba(59,130,246,.08)",  text:"#60a5fa", dot:"#3b82f6" },
+  "Interesado": { bg:"rgba(245,158,11,.08)",  text:"#fbbf24", dot:"#f59e0b" },
+  "Cotizado":   { bg:"rgba(139,92,246,.08)",  text:"#a78bfa", dot:"#8b5cf6" },
+  "Cerrado":    { bg:"rgba(52,211,153,.08)",  text:"#34d399", dot:"#10b981" },
+  "Perdido":    { bg:"rgba(239,68,68,.08)",   text:"#f87171", dot:"#ef4444" },
 };
 const STATUSES = ["Nuevo","Interesado","Cotizado","Cerrado","Perdido"];
 const NAV = [
@@ -41,59 +41,86 @@ const PREFIJOS = [
 ];
 
 const CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-  html,body,#root{height:100%;overflow:hidden;}
-  ::-webkit-scrollbar{width:3px;height:3px;}
-  ::-webkit-scrollbar-thumb{background:rgba(244,114,182,.3);border-radius:4px;}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  html,body,#root{height:100%;overflow:hidden;background-color:var(--bg);}
+  
+  /* Tipografía base fluida e impecable */
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar{width:4px;height:4px;}
+  ::-webkit-scrollbar-thumb{background:rgba(148, 163, 184, 0.2);border-radius:10px;}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(148, 163, 184, 0.4);}
+  
+  /* Animaciones cinemáticas suaves */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes popIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
-  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-  .fade-up{animation:fadeUp .22s ease both;}
-  .fade-in{animation:fadeIn .2s ease both;}
-  .pop-in{animation:popIn .2s cubic-bezier(.34,1.56,.64,1) both;}
+  @keyframes popIn{from{transform:scale(.97);opacity:0}to{transform:scale(1);opacity:1}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+  
+  .fade-up{animation:fadeUp .35s cubic-bezier(0.16, 1, 0.3, 1) both;}
+  .fade-in{animation:fadeIn .25s ease both;}
+  .pop-in{animation:popIn .3s cubic-bezier(0.34, 1.56, 0.64, 1) both;}
   .shake{animation:shake .3s ease;}
-  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:10px;cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--text2);border:1px solid transparent;}
+  
+  /* Elementos de Navegación Lateral */
+  .nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;cursor:pointer;transition:all .2s cubic-bezier(0.4, 0, 0.2, 1);font-size:13px;font-weight:500;color:var(--text2);border:1px solid transparent;}
   .nav-item:hover{background:var(--bg3);color:var(--text);}
-  .nav-item.active{background:linear-gradient(135deg,rgba(244,114,182,.12),rgba(167,139,250,.12));color:var(--accent);border-color:rgba(244,114,182,.2);font-weight:600;}
-  .card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;transition:all .2s;}
-  .card:hover{border-color:rgba(244,114,182,.25);box-shadow:0 4px 20px rgba(0,0,0,.2);}
-  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:Poppins,sans-serif;transition:all .15s;white-space:nowrap;}
-  .btn-primary{background:linear-gradient(135deg,#f472b6,#a78bfa);color:white;box-shadow:0 2px 12px rgba(244,114,182,.25);}
-  .btn-primary:hover{opacity:.9;transform:translateY(-1px);}
+  .nav-item.active{background:linear-gradient(135deg,rgba(244,114,182,.08),rgba(167,139,250,.08));color:var(--accent);border-color:rgba(244,114,182,.15);font-weight:600;}
+  
+  /* Tarjetas minimalistas con elevación sutil */
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;transition:all .25s cubic-bezier(0.4, 0, 0.2, 1);box-shadow:0 2px 12px rgba(0,0,0,0.015);}
+  .card:hover{border-color:rgba(244,114,182,.2);box-shadow:0 12px 30px rgba(0,0,0,.035);}
+  
+  /* Botones modernos */
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:12px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;transition:all .2s cubic-bezier(0.4, 0, 0.2, 1);white-space:nowrap;}
+  .btn-primary{background:linear-gradient(135deg,#f472b6,#a78bfa);color:white;box-shadow:0 4px 14px rgba(244,114,182,.2);}
+  .btn-primary:hover{opacity:.95;transform:translateY(-1px);box-shadow:0 6px 20px rgba(244,114,182,.3);}
   .btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
-  .btn-ghost:hover{color:var(--text);border-color:rgba(244,114,182,.3);}
-  .btn-danger{background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.2);}
-  .btn-danger:hover{background:rgba(239,68,68,.15);}
-  .btn-warning{background:rgba(245,158,11,.08);color:#fbbf24;border:1px solid rgba(245,158,11,.2);}
-  .btn-sm{padding:5px 11px;font-size:11px;border-radius:7px;}
-  .btn-icon{padding:7px;aspect-ratio:1;justify-content:center;}
-  .input{background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;padding:9px 13px;color:var(--text);font-size:13px;font-family:Poppins,sans-serif;width:100%;transition:all .15s;outline:none;}
-  .input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(244,114,182,.1);}
+  .btn-ghost:hover{color:var(--text);border-color:rgba(244,114,182,.25);background:var(--bg2);}
+  .btn-danger{background:rgba(239,68,68,.05);color:#f87171;border:1px solid rgba(239,68,68,.15);}
+  .btn-danger:hover{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);}
+  .btn-warning{background:rgba(245,158,11,.05);color:#fbbf24;border:1px solid rgba(245,158,11,.15);}
+  .btn-sm{padding:6px 12px;font-size:11px;border-radius:8px;}
+  .btn-icon{padding:8px;aspect-ratio:1;justify-content:center;}
+  
+  /* Controles de Entrada */
+  .input{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);font-size:13px;font-family:inherit;width:100%;transition:all .2s;outline:none;}
+  .input:focus{border-color:var(--accent);background:var(--bg2);box-shadow:0 0 0 3px rgba(244,114,182,.08);}
   .input::placeholder{color:var(--text3);}
-  .input-error{border-color:#ef4444!important;box-shadow:0 0 0 3px rgba(239,68,68,.1)!important;}
-  .phone-row{display:flex;gap:8px;}
-  .prefix-select{background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;padding:9px 10px;color:var(--text);font-size:13px;font-family:Poppins,sans-serif;transition:all .15s;outline:none;cursor:pointer;flex-shrink:0;width:150px;}
+  .input-error{border-color:#ef4444!important;box-shadow:0 0 0 3px rgba(239,68,68,.08)!important;}
+  .phone-row{display:flex;gap:10px;}
+  .prefix-select{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px;color:var(--text);font-size:13px;font-family:inherit;transition:all .2s;outline:none;cursor:pointer;flex-shrink:0;width:140px;}
   .prefix-select:focus{border-color:var(--accent);}
-  .conv-item{padding:13px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s;position:relative;}
+  
+  /* Lista de Chat y Burbujas */
+  .conv-item{padding:14px 18px;cursor:pointer;border-bottom:1px solid var(--border);transition:all .2s cubic-bezier(0.4, 0, 0.2, 1);position:relative;}
   .conv-item:hover{background:var(--bg3);}
-  .conv-item.active{background:linear-gradient(135deg,rgba(244,114,182,.07),rgba(167,139,250,.07));}
-  .conv-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#f472b6,#a78bfa);border-radius:0 2px 2px 0;}
-  .bubble{max-width:72%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;}
-  .tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:300;backdrop-filter:blur(6px);padding:16px;animation:fadeIn .15s ease;}
-  .modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:26px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:popIn .2s cubic-bezier(.34,1.56,.64,1);}
-  .alert-modal{max-width:360px;}
-  .notif{position:fixed;top:20px;right:20px;z-index:999;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,.4);display:flex;align-items:center;gap:10px;font-size:13px;animation:fadeUp .2s ease;min-width:260px;}
-  select option{background:#1a1d27;}
+  .conv-item.active{background:var(--bg3);}
+  .conv-item.active::before{content:'';position:absolute;left:0;top:10%;bottom:10%;width:3px;background:linear-gradient(180deg,#f472b6,#a78bfa);border-radius:0 4px 4px 0;}
+  .bubble{max-width:70%;padding:10px 15px;border-radius:16px;font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word;box-shadow:0 1px 3px rgba(0,0,0,0.01);}
+  .tag{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;}
+  
+  /* Modales Estilo Glassmorphism */
+  .modal-overlay{position:fixed;inset:0;background:rgba(9,11,18,.45);display:flex;align-items:center;justify-content:center;z-index:300;backdrop-filter:blur(8px);padding:16px;animation:fadeIn .25s ease;}
+  .modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:440px;box-shadow:0 24px 60px rgba(0,0,0,.15);animation:popIn .3s cubic-bezier(0.34,1.56,.64,1);}
+  .alert-modal{max-width:380px;}
+  
+  /* Notificaciones Flotantes */
+  .notif{position:fixed;top:24px;right:24px;z-index:999;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px 20px;box-shadow:0 12px 36px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;font-size:13px;animation:fadeUp .3s cubic-bezier(0.16, 1, 0.3, 1);min-width:280px;}
+  select option{background:var(--bg2); color:var(--text);}
+  
   @media(max-width:768px){
     .desktop-sidebar{display:none!important;}
-    .mobile-tabbar{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--bg2);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 env(safe-area-inset-bottom,8px);}
-    .mobile-tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 14px;border-radius:10px;cursor:pointer;font-size:10px;font-weight:500;color:var(--text3);}
+    .mobile-tabbar{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--bg2);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:10px 0 env(safe-area-inset-bottom,10px);}
+    .mobile-tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 14px;border-radius:10px;cursor:pointer;font-size:10px;font-weight:500;color:var(--text3);}
     .mobile-tab.active{color:var(--accent);}
-    .mobile-tab-icon{font-size:20px;}
+    .mobile-tab-icon{font-size:18px;}
   }
   @media(min-width:769px){
     .mobile-tabbar{display:none!important;}
@@ -131,7 +158,6 @@ export default function App() {
   const prevMsgCount = useRef({});
   const notifTimer = useRef(null);
 
-  // Helper para resetear campos de nueva chat
   const resetNewChatFields = () => {
     setNewChatNumero("");
     setNewChatNombre("");
@@ -370,18 +396,23 @@ export default function App() {
     .sort((a,b) => b.sinLeer - a.sinLeer);
 
   const theme = {
-    "--bg":dark?"#0d0f18":"#f4f6fb","--bg2":dark?"#13161f":"#ffffff",
-    "--bg3":dark?"#1c2033":"#f0f2f8","--border":dark?"#232740":"#e2e6f0",
-    "--text":dark?"#eef0f8":"#0d0f18","--text2":dark?"#8892b0":"#64748b",
-    "--text3":dark?"#3d4565":"#94a3b8","--accent":"#f472b6",
-    "--accent2":"#a78bfa","--accent3":"#34d399",
+    "--bg":dark?"#090a0f":"#f8fafc",
+    "--bg2":dark?"#0f111a":"#ffffff",
+    "--bg3":dark?"#151824":"#f1f5f9",
+    "--border":dark?"#1d2133":"#e2e8f0",
+    "--text":dark?"#f1f3f9":"#0f172a",
+    "--text2":dark?"#94a3b8":"#475569",
+    "--text3":dark?"#475569":"#94a3b8",
+    "--accent":"#f472b6",
+    "--accent2":"#a78bfa",
+    "--accent3":"#34d399",
   };
 
   if (loading) return (
     <div style={{ display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",background:"#0d0f18",flexDirection:"column",gap:14 }}>
       <style>{CSS}</style>
       <div style={{ width:40,height:40,border:"3px solid rgba(244,114,182,.2)",borderTop:"3px solid #f472b6",borderRadius:"50%",animation:"spin 1s linear infinite" }} />
-      <div style={{ color:"#f472b6",fontFamily:"Poppins,sans-serif",fontSize:13,fontWeight:600 }}>Cargando DND Boutique...</div>
+      <div style={{ color:"#f472b6",fontFamily:"inherit",fontSize:13,fontWeight:600 }}>Cargando DND Boutique...</div>
     </div>
   );
 
@@ -396,12 +427,12 @@ export default function App() {
   };
 
   return (
-    <div style={{ ...theme,display:"flex",height:"100vh",background:"var(--bg)",fontFamily:"'Poppins',sans-serif",color:"var(--text)",overflow:"hidden" }}>
+    <div style={{ ...theme,display:"flex",height:"100vh",background:"var(--bg)",fontFamily:"inherit",color:"var(--text)",overflow:"hidden" }}>
       <style>{CSS}</style>
 
       {/* Notificación flotante */}
       {notif && (
-        <div className="notif" style={{ fontFamily:"Poppins,sans-serif" }}>
+        <div className="notif">
           <span style={{ fontSize:20 }}>📩</span>
           <div>
             <div style={{ fontWeight:700,fontSize:13 }}>{notif.title}</div>
@@ -511,7 +542,7 @@ export default function App() {
               <div>
                 <label style={{ fontSize:11,color:"var(--text3)",fontWeight:600,display:"block",marginBottom:6 }}>NOTAS</label>
                 <textarea className="input" placeholder="Notas sobre este cliente..." rows={3}
-                  style={{ resize:"none" }} value={editChatData.notas}
+                  style={{ resize:"none" }} value={editChatData.notes}
                   onChange={e=>setEditChatData({...editChatData,notas:e.target.value})} />
               </div>
               <div style={{ display:"flex",gap:10,marginTop:4 }}>
@@ -542,16 +573,16 @@ export default function App() {
         </div>
       )}
 
-      {/* Sidebar desktop */}
-      <aside className="desktop-sidebar" style={{ width:220,background:"var(--bg2)",borderRight:"1px solid var(--border)",display:"flex",flexDirection:"column",padding:"20px 12px",flexShrink:0 }}>
-        <div style={{ padding:"6px 10px 22px" }}>
-          <div style={{ fontSize:18,fontWeight:800,background:"linear-gradient(135deg,#f472b6,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent" }}>DND Boutique</div>
-          <div style={{ fontSize:10,color:"var(--text3)",marginTop:1,letterSpacing:".5px",fontWeight:500 }}>CRM · WhatsApp IA</div>
+      {/* Sidebar de escritorio minimalista */}
+      <aside className="desktop-sidebar" style={{ width:230,background:"var(--bg2)",borderRight:"1px solid var(--border)",display:"flex",flexDirection:"column",padding:"24px 16px",flexShrink:0 }}>
+        <div style={{ padding:"6px 10px 26px" }}>
+          <div style={{ fontSize:19,fontWeight:800,background:"linear-gradient(135deg,#f472b6,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent" }}>DND Boutique</div>
+          <div style={{ fontSize:10,color:"var(--text3)",marginTop:2,letterSpacing:".8px",fontWeight:600 }}>CRM · WHATSAPP IA</div>
         </div>
-        <nav style={{ display:"flex",flexDirection:"column",gap:3,flex:1 }}>
+        <nav style={{ display:"flex",flexDirection:"column",gap:4,flex:1 }}>
           {NAV.map(item => (
             <div key={item.id} className={`nav-item ${section===item.id?"active":""}`} onClick={()=>setSection(item.id)}>
-              <span style={{ fontSize:16,opacity:.8 }}>{item.icon}</span>
+              <span style={{ fontSize:15,opacity:.9 }}>{item.icon}</span>
               <span>{item.label}</span>
               {item.id==="conversations" && chatsUnread>0 && (
                 <span style={{ marginLeft:"auto",background:"var(--accent)",color:"white",fontSize:10,fontWeight:700,borderRadius:20,padding:"1px 7px",minWidth:20,textAlign:"center" }}>{chatsUnread}</span>
@@ -559,29 +590,29 @@ export default function App() {
             </div>
           ))}
         </nav>
-        <button className="btn btn-primary" style={{ width:"100%",marginBottom:12,justifyContent:"center" }} onClick={()=>setShowNewChat(true)}>+ Nueva conversación</button>
-        <div style={{ borderTop:"1px solid var(--border)",paddingTop:14,display:"flex",alignItems:"center",justifyContent:"space-between" }}>
+        <button className="btn btn-primary" style={{ width:"100%",marginBottom:16,justifyContent:"center" }} onClick={()=>setShowNewChat(true)}>+ Nueva conversación</button>
+        <div style={{ borderTop:"1px solid var(--border)",paddingTop:16,display:"flex",alignItems:"center",justifyContent:"space-between" }}>
           <span style={{ fontSize:11,color:"var(--text3)" }}>{dark?"Modo oscuro":"Modo claro"}</span>
           <button onClick={()=>setDark(!dark)} style={{ background:"var(--bg3)",border:"1px solid var(--border)",borderRadius:20,padding:"3px 12px",cursor:"pointer",fontSize:14 }}>{dark?"☀️":"🌙"}</button>
         </div>
       </aside>
 
-      {/* Main */}
+      {/* Panel Principal */}
       <div style={{ flex:1,display:"flex",flexDirection:"column",overflow:"hidden" }}>
-        <header style={{ padding:"13px 24px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",justifyContent:"space-between",background:"var(--bg2)",flexShrink:0 }}>
+        <header style={{ padding:"16px 24px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",justifyContent:"space-between",background:"var(--bg2)",flexShrink:0 }}>
           <div>
-            <h1 style={{ fontSize:17,fontWeight:700,letterSpacing:"-.2px" }}>{NAV.find(n=>n.id===section)?.label}</h1>
+            <h1 style={{ fontSize:18,fontWeight:700,letterSpacing:"-.3px" }}>{NAV.find(n=>n.id===section)?.label}</h1>
             <p style={{ fontSize:10,color:"var(--text3)",marginTop:1 }}>{new Date().toLocaleDateString("es-SV",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}</p>
           </div>
-          <div style={{ display:"flex",alignItems:"center",gap:10 }}>
+          <div style={{ display:"flex",alignItems:"center",gap:12 }}>
             <button className="mobile-only" onClick={()=>setDark(!dark)} style={{ background:"var(--bg3)",border:"1px solid var(--border)",borderRadius:20,padding:"3px 10px",cursor:"pointer",fontSize:14 }}>{dark?"☀️":"🌙"}</button>
             <div style={{ display:"flex",alignItems:"center",gap:6 }}>
               <span style={{ width:7,height:7,borderRadius:"50%",background:"var(--accent3)",boxShadow:"0 0 8px var(--accent3)" }} />
-              <span style={{ fontSize:11,color:"var(--accent3)",fontWeight:500 }}>Firebase + N8N activos</span>
+              <span style={{ fontSize:11,color:"var(--accent3)",fontWeight:600 }}>Firebase + N8N activos</span>
             </div>
           </div>
         </header>
-        <main style={{ flex:1,overflow:"auto",padding:section==="conversations"?0:"24px" }} className="fade-up">
+        <main style={{ flex:1,overflow:"auto",padding:section==="conversations"?0:"28px" }} className="fade-up">
           {section==="dashboard"     && <Dashboard {...shared} />}
           {section==="conversations" && <Conversations {...shared} showEditChat={showEditChat} setShowEditChat={setShowEditChat} abrirEditChat={abrirEditChat} />}
           {section==="clients"       && <Clients {...shared} />}
@@ -590,7 +621,7 @@ export default function App() {
         </main>
       </div>
 
-      {/* Mobile tabbar */}
+      {/* Tabbar para Móviles */}
       <div className="mobile-tabbar">
         {NAV.map(item => (
           <div key={item.id} className={`mobile-tab ${section===item.id?"active":""}`} onClick={()=>{setSection(item.id);setSelectedPhone(null);}}>
@@ -614,8 +645,8 @@ export default function App() {
 
 function Dashboard({ clients, combos, totalVentas, conversion, chatsUnread }) {
   return (
-    <div style={{ maxWidth:900 }}>
-      <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(175px,1fr))",gap:12,marginBottom:20 }}>
+    <div style={{ maxWidth:960 }}>
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))",gap:14,marginBottom:24 }}>
         {[
           { label:"Clientes",       value:clients.length,                                  icon:"◈", color:"var(--accent)" },
           { label:"Ventas cerradas",value:clients.filter(c=>c.status==="Cerrado").length,  icon:"✓", color:"var(--accent3)" },
@@ -623,44 +654,44 @@ function Dashboard({ clients, combos, totalVentas, conversion, chatsUnread }) {
           { label:"Conversión",     value:`${conversion}%`,                                icon:"↑", color:"var(--accent2)" },
           { label:"Chats sin leer", value:chatsUnread,                                     icon:"◎", color:"var(--accent)" },
         ].map((s,i) => (
-          <div key={i} className="card fade-up" style={{ padding:"18px 20px",animationDelay:`${i*.05}s` }}>
-            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12 }}>
-              <span style={{ fontSize:10,color:"var(--text3)",fontWeight:600,textTransform:"uppercase",letterSpacing:"1px" }}>{s.label}</span>
+          <div key={i} className="card fade-up" style={{ padding:"20px 22px",animationDelay:`${i*.05}s` }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14 }}>
+              <span style={{ fontSize:10,color:"var(--text3)",fontWeight:700,textTransform:"uppercase",letterSpacing:"1.2px" }}>{s.label}</span>
               <span style={{ fontSize:16,color:s.color,fontWeight:700 }}>{s.icon}</span>
             </div>
-            <div style={{ fontSize:26,fontWeight:800,color:s.color,letterSpacing:"-1px" }}>{s.value}</div>
+            <div style={{ fontSize:28,fontWeight:800,color:s.color,letterSpacing:"-1.2px" }}>{s.value}</div>
           </div>
         ))}
       </div>
-      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:14 }}>
-        <div className="card" style={{ padding:20 }}>
-          <h3 style={{ fontSize:12,fontWeight:700,marginBottom:16,color:"var(--text3)",textTransform:"uppercase",letterSpacing:"1px" }}>Pipeline</h3>
+      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16 }}>
+        <div className="card" style={{ padding:24 }}>
+          <h3 style={{ fontSize:11,fontWeight:700,marginBottom:20,color:"var(--text3)",textTransform:"uppercase",letterSpacing:"1.2px" }}>Pipeline</h3>
           {STATUSES.map(status => {
             const count = clients.filter(c=>c.status===status).length;
             const pct = clients.length?(count/clients.length)*100:0;
             const m = STATUS_META[status];
             return (
-              <div key={status} style={{ marginBottom:14 }}>
-                <div style={{ display:"flex",justifyContent:"space-between",marginBottom:6 }}>
+              <div key={status} style={{ marginBottom:16 }}>
+                <div style={{ display:"flex",justifyContent:"space-between",marginBottom:8 }}>
                   <span className="tag" style={{ background:m.bg,color:m.text }}>
-                    <span style={{ width:5,height:5,borderRadius:"50%",background:m.dot,display:"inline-block" }} />{status}
+                    <span style={{ width:6,height:6,borderRadius:"50%",background:m.dot,display:"inline-block" }} />{status}
                   </span>
                   <span style={{ fontSize:13,fontWeight:700 }}>{count}</span>
                 </div>
-                <div style={{ height:3,background:"var(--bg3)",borderRadius:4,overflow:"hidden" }}>
+                <div style={{ height:4,background:"var(--bg3)",borderRadius:4,overflow:"hidden" }}>
                   <div style={{ height:"100%",width:`${pct}%`,background:"linear-gradient(90deg,var(--accent),var(--accent2))",borderRadius:4,transition:"width .6s" }} />
                 </div>
               </div>
             );
           })}
         </div>
-        <div className="card" style={{ padding:20 }}>
-          <h3 style={{ fontSize:12,fontWeight:700,marginBottom:16,color:"var(--text3)",textTransform:"uppercase",letterSpacing:"1px" }}>Combos activos</h3>
+        <div className="card" style={{ padding:24 }}>
+          <h3 style={{ fontSize:11,fontWeight:700,marginBottom:20,color:"var(--text3)",textTransform:"uppercase",letterSpacing:"1.2px" }}>Combos activos</h3>
           {combos.filter(c=>c.activo).map(combo => (
-            <div key={combo.id} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 14px",background:"var(--bg3)",borderRadius:10,marginBottom:8 }}>
+            <div key={combo.id} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",background:"var(--bg3)",borderRadius:12,marginBottom:10 }}>
               <div>
                 <div style={{ fontSize:13,fontWeight:600 }}>◇ {combo.nombre}</div>
-                <div style={{ fontSize:11,color:"var(--text3)",marginTop:1 }}>{combo.descripcion?.slice(0,50)}</div>
+                <div style={{ fontSize:11,color:"var(--text3)",marginTop:2 }}>{combo.descripcion?.slice(0,50)}</div>
               </div>
               <div style={{ textAlign:"right",flexShrink:0 }}>
                 <div style={{ fontSize:16,fontWeight:800,color:"var(--accent3)" }}>${combo.precio}</div>
@@ -682,7 +713,7 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
 
   const ChatList = (
     <div style={{ display:"flex",flexDirection:"column",height:"100%",background:"var(--bg2)",borderRight:"1px solid var(--border)" }}>
-      <div style={{ padding:"12px 14px",borderBottom:"1px solid var(--border)",flexShrink:0 }}>
+      <div style={{ padding:"14px",borderBottom:"1px solid var(--border)",flexShrink:0 }}>
         <input className="input" placeholder="Buscar conversación..."
           style={{ fontSize:12 }} value={searchConv}
           onChange={e=>setSearchConv(e.target.value)} />
@@ -696,12 +727,12 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
         )}
         {convList.map(c => (
           <div key={c.telefono} className={`conv-item ${selectedPhone===c.telefono?"active":""}`} onClick={()=>setSelectedPhone(c.telefono)}>
-            <div style={{ display:"flex",gap:11,alignItems:"center" }}>
-              <div style={{ width:42,height:42,borderRadius:"50%",background:"linear-gradient(135deg,var(--accent),var(--accent2))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontWeight:700,color:"white",flexShrink:0 }}>
+            <div style={{ display:"flex",gap:12,alignItems:"center" }}>
+              <div style={{ width:40,height:40,borderRadius:"50%",background:"linear-gradient(135deg,var(--accent),var(--accent2))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:700,color:"white",flexShrink:0 }}>
                 {c.nombre[0]?.toUpperCase()}
               </div>
               <div style={{ flex:1,minWidth:0 }}>
-                <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:3 }}>
+                <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4 }}>
                   <span style={{ fontSize:13,fontWeight:600 }}>{c.nombre}</span>
                   <span style={{ fontSize:10,color:"var(--text3)" }}>{c.ultimoTiempo}</span>
                 </div>
@@ -722,9 +753,9 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
 
   const ChatArea = conv ? (
     <div style={{ flex:1,display:"flex",flexDirection:"column",minWidth:0 }}>
-      <div style={{ padding:"12px 20px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",justifyContent:"space-between",background:"var(--bg2)",flexShrink:0 }}>
-        <div style={{ display:"flex",alignItems:"center",gap:11 }}>
-          <div style={{ width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,var(--accent),var(--accent2))",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,color:"white",fontSize:14 }}>
+      <div style={{ padding:"14px 20px",borderBottom:"1px solid var(--border)",display:"flex",alignItems:"center",justify:"space-between",background:"var(--bg2)",flexShrink:0 }}>
+        <div style={{ display:"flex",alignItems:"center",gap:12 }}>
+          <div style={{ width:38,height:38,borderRadius:"50%",background:"linear-gradient(135deg,var(--accent),var(--accent2))",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,color:"white",fontSize:14 }}>
             {(conv.nombre||selectedPhone)[0]?.toUpperCase()}
           </div>
           <div>
@@ -732,9 +763,9 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
             <div style={{ fontSize:10,color:"var(--text3)" }}>+{selectedPhone}</div>
           </div>
           <button className="btn btn-ghost btn-icon btn-sm" onClick={abrirEditChat} title="Editar contacto"
-            style={{ marginLeft:4 }}>✎</button>
+            style={{ marginLeft:6 }}>✎</button>
         </div>
-        <div style={{ display:"flex",gap:8,alignItems:"center",flexWrap:"wrap" }}>
+        <div style={{ display:"flex",gap:10,alignItems:"center",flexWrap:"wrap" }}>
           {clienteRelacionado && (
             <select className="input" value={clienteRelacionado.status||"Nuevo"}
               style={{ width:130,fontSize:11,padding:"4px 10px",height:"auto",
@@ -746,7 +777,7 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
               {STATUSES.map(s=><option key={s}>{s}</option>)}
             </select>
           )}
-          <span style={{ fontSize:11,padding:"4px 11px",borderRadius:20,fontWeight:600,
+          <span style={{ fontSize:11,padding:"4px 12px",borderRadius:20,fontWeight:600,
             background:conv.botActivo?"rgba(244,114,182,.1)":"rgba(245,158,11,.1)",
             color:conv.botActivo?"var(--accent)":"#fbbf24" }}>
             {conv.botActivo?"🤖 Bot activo":"👤 Tú atiendes"}
@@ -757,7 +788,7 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
         </div>
       </div>
 
-      <div style={{ flex:1,overflowY:"auto",padding:"20px",display:"flex",flexDirection:"column",gap:10,background:"var(--bg)" }}>
+      <div style={{ flex:1,overflowY:"auto",padding:"24px",display:"flex",flexDirection:"column",gap:12,background:"var(--bg)" }}>
         {(conv.mensajes||[]).length===0 && (
           <div style={{ textAlign:"center",color:"var(--text3)",marginTop:60,fontSize:13 }}>Sin mensajes aún</div>
         )}
@@ -767,8 +798,8 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
               background:msg.from==="client"?"var(--bg2)":msg.from==="bot"?"rgba(167,139,250,.1)":"linear-gradient(135deg,#f472b6,#a78bfa)",
               color:msg.from==="user"?"white":"var(--text)",
               border:msg.from==="client"?"1px solid var(--border)":msg.from==="bot"?"1px solid rgba(167,139,250,.25)":"none",
-              borderBottomLeftRadius:msg.from==="client"?4:14,
-              borderBottomRightRadius:msg.from!=="client"?4:14,
+              borderBottomLeftRadius:msg.from==="client"?4:16,
+              borderBottomRightRadius:msg.from!=="client"?4:16,
             }}>
               {msg.from==="bot" && <div style={{ fontSize:10,color:"var(--accent2)",fontWeight:700,marginBottom:4 }}>🤖 BOT · N8N</div>}
               {msg.texto}
@@ -779,15 +810,15 @@ function Conversations({ conversations,convList,selectedPhone,setSelectedPhone,n
         <div ref={chatEndRef} style={{ height:1 }} />
       </div>
 
-      <div style={{ padding:"12px 20px",borderTop:"1px solid var(--border)",display:"flex",gap:10,background:"var(--bg2)",flexShrink:0 }}>
+      <div style={{ padding:"14px 20px",borderTop:"1px solid var(--border)",display:"flex",gap:10,background:"var(--bg2)",flexShrink:0 }}>
         <input className="input" value={newMsg} onChange={e=>setNewMsg(e.target.value)}
           onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&(e.preventDefault(),enviarMensaje())}
           placeholder="Escribe un mensaje... (Enter para enviar)" style={{ flex:1 }} />
-        <button className="btn btn-primary" onClick={enviarMensaje} style={{ paddingLeft:20,paddingRight:20 }}>→</button>
+        <button className="btn btn-primary" onClick={enviarMensaje} style={{ paddingLeft:22,paddingRight:22 }}>→</button>
       </div>
     </div>
   ) : (
-    <div style={{ flex:1,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:10,color:"var(--text3)" }}>
+    <div style={{ flex:1,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:12,color:"var(--text3)" }}>
       <div style={{ fontSize:48,opacity:.15 }}>◎</div>
       <div style={{ fontSize:14 }}>Selecciona una conversación</div>
     </div>
@@ -807,17 +838,17 @@ function Clients({ clients,showAddClient,setShowAddClient,newClient,setNewClient
     c.nombre?.toLowerCase().includes(search.toLowerCase())||c.telefono?.includes(search)
   );
   return (
-    <div style={{ maxWidth:860 }}>
-      <div style={{ display:"flex",justifyContent:"space-between",marginBottom:18,gap:12,flexWrap:"wrap" }}>
+    <div style={{ maxWidth:880 }}>
+      <div style={{ display:"flex",justifyContent:"space-between",marginBottom:20,gap:12,flexWrap:"wrap" }}>
         <input className="input" placeholder="Buscar cliente..." style={{ maxWidth:280,fontSize:12 }} value={search} onChange={e=>setSearch(e.target.value)} />
         <button className="btn btn-primary" onClick={()=>setShowAddClient(true)}>+ Nuevo cliente</button>
       </div>
-      <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
+      <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
         {filtered.map((client,i) => {
           const m = STATUS_META[client.status||"Nuevo"];
           return (
-            <div key={client.id} className="card fade-up" style={{ padding:"13px 18px",display:"flex",alignItems:"center",gap:14,flexWrap:"wrap",animationDelay:`${i*.03}s` }}>
-              <div style={{ width:40,height:40,borderRadius:"50%",background:"linear-gradient(135deg,var(--accent),var(--accent2))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontWeight:700,color:"white",flexShrink:0 }}>
+            <div key={client.id} className="card fade-up" style={{ padding:"14px 20px",display:"flex",alignItems:"center",gap:16,flexWrap:"wrap",animationDelay:`${i*.03}s` }}>
+              <div style={{ width:38,height:38,borderRadius:"50%",background:"linear-gradient(135deg,var(--accent),var(--accent2))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:700,color:"white",flexShrink:0 }}>
                 {client.nombre[0]?.toUpperCase()}
               </div>
               <div style={{ flex:1,minWidth:120 }}>
@@ -825,10 +856,10 @@ function Clients({ clients,showAddClient,setShowAddClient,newClient,setNewClient
                 <div style={{ fontSize:11,color:"var(--text3)" }}>{client.telefono}</div>
                 {client.notas && <div style={{ fontSize:11,color:"var(--text3)",marginTop:2,fontStyle:"italic" }}>📝 {client.notas.slice(0,60)}</div>}
               </div>
-              <div style={{ display:"flex",alignItems:"center",gap:10,flexWrap:"wrap" }}>
+              <div style={{ display:"flex",alignItems:"center",gap:12,flexWrap:"wrap" }}>
                 {client.totalGastado>0 && <span style={{ fontSize:14,fontWeight:800,color:"var(--accent3)" }}>${client.totalGastado}</span>}
                 <span className="tag" style={{ background:m.bg,color:m.text }}>
-                  <span style={{ width:5,height:5,borderRadius:"50%",background:m.dot,display:"inline-block" }} />{client.status||"Nuevo"}
+                  <span style={{ width:6,height:6,borderRadius:"50%",background:m.dot,display:"inline-block" }} />{client.status||"Nuevo"}
                 </span>
                 <select className="input" value={client.status||"Nuevo"} style={{ width:130,fontSize:12 }} onChange={e=>updateClientStatus(client.id,e.target.value)}>
                   {STATUSES.map(s=><option key={s}>{s}</option>)}
@@ -862,16 +893,16 @@ function Clients({ clients,showAddClient,setShowAddClient,newClient,setNewClient
 
 function Combos({ combos,showAddCombo,setShowAddCombo,showEditCombo,setShowEditCombo,editCombo,setEditCombo,saveEditCombo,newCombo,setNewCombo,addCombo,db }) {
   return (
-    <div style={{ maxWidth:900 }}>
-      <div style={{ display:"flex",justifyContent:"space-between",marginBottom:18,flexWrap:"wrap",gap:10,alignItems:"center" }}>
+    <div style={{ maxWidth:920 }}>
+      <div style={{ display:"flex",justifyContent:"space-between",marginBottom:20,flexWrap:"wrap",gap:10,alignItems:"center" }}>
         <p style={{ fontSize:12,color:"var(--text3)" }}>{combos.filter(c=>c.activo).length} activos · {combos.length} total</p>
         <button className="btn btn-primary" onClick={()=>setShowAddCombo(true)}>+ Nuevo combo</button>
       </div>
-      <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:14 }}>
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(250px,1fr))",gap:16 }}>
         {combos.map((combo,i) => (
-          <div key={combo.id} className="card fade-up" style={{ padding:20,opacity:combo.activo?1:.55,animationDelay:`${i*.05}s` }}>
-            <div style={{ display:"flex",justifyContent:"space-between",marginBottom:14 }}>
-              <span style={{ fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:20,
+          <div key={combo.id} className="card fade-up" style={{ padding:22,opacity:combo.activo?1:.55,animationDelay:`${i*.05}s` }}>
+            <div style={{ display:"flex",justifyContent:"space-between",marginBottom:16 }}>
+              <span style={{ fontSize:11,fontWeight:700,padding:"4px 12px",borderRadius:20,
                 background:combo.activo?"rgba(52,211,153,.1)":"var(--bg3)",
                 color:combo.activo?"var(--accent3)":"var(--text3)" }}>
                 {combo.activo?"ACTIVO":"INACTIVO"}
@@ -884,10 +915,10 @@ function Combos({ combos,showAddCombo,setShowAddCombo,showEditCombo,setShowEditC
                 <button className="btn btn-danger btn-icon btn-sm" onClick={()=>deleteDoc(doc(db,"combos",combo.id))}>✕</button>
               </div>
             </div>
-            <h3 style={{ fontSize:15,fontWeight:700,marginBottom:4 }}>◇ {combo.nombre}</h3>
-            <p style={{ fontSize:12,color:"var(--text3)",marginBottom:16,lineHeight:1.5 }}>{combo.descripcion?.slice(0,100)}{combo.descripcion?.length>100?"...":""}</p>
-            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
-              <span style={{ fontSize:22,fontWeight:800,color:"var(--accent3)" }}>${combo.precio}</span>
+            <h3 style={{ fontSize:15,fontWeight:700,marginBottom:6 }}>◇ {combo.nombre}</h3>
+            <p style={{ fontSize:12,color:"var(--text3)",marginBottom:20,lineHeight:1.6 }}>{combo.descripcion?.slice(0,100)}{combo.descripcion?.length>100?"...":""}</p>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16 }}>
+              <span style={{ fontSize:24,fontWeight:800,color:"var(--accent3)" }}>${combo.precio}</span>
               <span style={{ fontSize:11,color:"var(--text3)" }}>stock: {combo.stock}</span>
             </div>
             <button className="btn btn-ghost" style={{ width:"100%",justifyContent:"center",fontSize:12 }}
@@ -921,37 +952,37 @@ function Combos({ combos,showAddCombo,setShowAddCombo,showEditCombo,setShowEditC
 function Pipeline({ clients,updateClientStatus }) {
   return (
     <div>
-      <p style={{ fontSize:12,color:"var(--text3)",marginBottom:18,textTransform:"uppercase",letterSpacing:"1px",fontWeight:600 }}>Vista kanban</p>
-      <div style={{ display:"flex",gap:12,overflowX:"auto",paddingBottom:12 }}>
+      <p style={{ fontSize:11,color:"var(--text3)",marginBottom:20,textTransform:"uppercase",letterSpacing:"1.2px",fontWeight:700 }}>Vista kanban</p>
+      <div style={{ display:"flex",gap:14,overflowX:"auto",paddingBottom:16 }}>
         {STATUSES.map(status => {
           const m = STATUS_META[status];
           const sc = clients.filter(c=>c.status===status);
           return (
-            <div key={status} style={{ minWidth:190,flex:"0 0 190px" }}>
-              <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:12,padding:"7px 13px",background:m.bg,borderRadius:10 }}>
-                <span style={{ width:7,height:7,borderRadius:"50%",background:m.dot,display:"inline-block" }} />
+            <div key={status} style={{ minWidth:210,flex:"0 0 210px" }}>
+              <div style={{ display:"flex",alignItems:"center",gap:10,marginBottom:14,padding:"8px 14px",background:m.bg,borderRadius:12 }}>
+                <span style={{ width:6,height:6,borderRadius:"50%",background:m.dot,display:"inline-block" }} />
                 <span style={{ fontSize:12,fontWeight:700,color:m.text }}>{status}</span>
                 <span style={{ marginLeft:"auto",fontSize:11,color:m.text,opacity:.7 }}>{sc.length}</span>
               </div>
-              <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
+              <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
                 {sc.map(client => (
-                  <div key={client.id} className="card" style={{ padding:13 }}>
-                    <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:6 }}>
-                      <div style={{ width:26,height:26,borderRadius:"50%",background:"linear-gradient(135deg,var(--accent),var(--accent2))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,color:"white",flexShrink:0 }}>
+                  <div key={client.id} className="card" style={{ padding:14 }}>
+                    <div style={{ display:"flex",alignItems:"center",gap:10,marginBottom:8 }}>
+                      <div style={{ width:24,height:24,borderRadius:"50%",background:"linear-gradient(135deg,var(--accent),var(--accent2))",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:"white",flexShrink:0 }}>
                         {client.nombre[0]?.toUpperCase()}
                       </div>
                       <span style={{ fontSize:12,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{client.nombre}</span>
                     </div>
                     <div style={{ fontSize:10,color:"var(--text3)" }}>{client.telefono}</div>
-                    {client.notas && <div style={{ fontSize:10,color:"var(--text3)",marginTop:3,fontStyle:"italic" }}>📝 {client.notas.slice(0,40)}</div>}
-                    {client.totalGastado>0 && <div style={{ fontSize:13,fontWeight:800,color:"var(--accent3)",marginTop:6 }}>${client.totalGastado}</div>}
-                    <select className="input" value={client.status||"Nuevo"} style={{ width:"100%",fontSize:11,marginTop:8,padding:"4px 8px" }}
+                    {client.notas && <div style={{ fontSize:10,color:"var(--text3)",marginTop:4,fontStyle:"italic" }}>📝 {client.notas.slice(0,40)}</div>}
+                    {client.totalGastado>0 && <div style={{ fontSize:13,fontWeight:800,color:"var(--accent3)",marginTop:8 }}>${client.totalGastado}</div>}
+                    <select className="input" value={client.status||"Nuevo"} style={{ width:"100%",fontSize:11,marginTop:10,padding:"4px 8px" }}
                       onChange={e=>updateClientStatus(client.id,e.target.value)}>
                       {STATUSES.map(s=><option key={s}>{s}</option>)}
                     </select>
                   </div>
                 ))}
-                {sc.length===0 && <div style={{ padding:"18px 12px",textAlign:"center",color:"var(--text3)",fontSize:11,border:"1px dashed var(--border)",borderRadius:10 }}>Vacío</div>}
+                {sc.length===0 && <div style={{ padding:"24px 14px",textAlign:"center",color:"var(--text3)",fontSize:11,border:"1.5px dashed var(--border)",borderRadius:14 }}>Vacío</div>}
               </div>
             </div>
           );
