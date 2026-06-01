@@ -403,7 +403,15 @@ export default function App() {
     const msgs = conv.mensajes || [];
     const ultimo = msgs[msgs.length - 1];
     if (ultimo?.from === "user" && ultimo?.texto === texto) { setNewMsg(""); return; }
-    const mensajes = [...msgs, { from: "user", texto, tiempo }];
+    
+    // Guardamos con marcas temporales robustas y estado de envío optimista "sent"
+    const mensajes = [...msgs, { 
+      from: "user", 
+      texto, 
+      tiempo, 
+      timestamp: Date.now(), 
+      status: "sent" 
+    }];
     await setDoc(doc(db, "conversaciones", selectedPhone),
       { ...conv, mensajes, ultimoMsg: texto, ultimoTiempo: tiempo, sinLeer: 0 }, { merge: true });
     try {
@@ -934,21 +942,76 @@ function Conversations({ conversations, convList, selectedPhone, setSelectedPhon
         {(conv.mensajes || []).length === 0 && (
           <div style={{ textAlign: "center", color: "var(--text-light)", marginTop: 60, fontSize: 12 }}>Sin mensajes aún</div>
         )}
-        {(conv.mensajes || []).map((msg, i) => (
-          <div key={i} style={{ display: "flex", justifyContent: msg.from === "client" ? "flex-start" : "flex-end" }}>
-            <div className="bubble" style={{
-              background: msg.from === "client" ? "var(--bg-card)" : msg.from === "bot" ? "rgba(139, 92, 246, 0.08)" : "var(--text-main)",
-              color: msg.from === "user" ? "var(--bg-card)" : "var(--text-main)",
-              border: msg.from === "client" ? "1px solid var(--border)" : msg.from === "bot" ? "1px solid rgba(139, 92, 246, 0.15)" : "none",
-              borderBottomLeftRadius: msg.from === "client" ? 4 : 14,
-              borderBottomRightRadius: msg.from !== "client" ? 4 : 14,
-            }}>
-              {msg.from === "bot" && <div style={{ fontSize: 9, color: "#8b5cf6", fontWeight: 700, marginBottom: 4 }}>🤖 BOT</div>}
-              {msg.texto}
-              <div style={{ fontSize: 8, marginTop: 4, textAlign: "right", color: msg.from === "user" ? "rgba(255,255,255,0.6)" : "var(--text-light)" }}>{msg.tiempo}</div>
-            </div>
-          </div>
-        ))}
+        {(() => {
+          let lastDateStr = "";
+          return (conv.mensajes || []).map((msg, i) => {
+            const msgDateObj = msg.timestamp ? new Date(msg.timestamp) : null;
+            const msgDateStr = msgDateObj ? msgDateObj.toDateString() : "anterior";
+            let showDateHeader = false;
+            
+            if (msgDateStr !== lastDateStr) {
+              showDateHeader = true;
+              lastDateStr = msgDateStr;
+            }
+
+            return (
+              <div key={i}>
+                {showDateHeader && (
+                  <div style={{ display: "flex", justifyContent: "center", margin: "24px 0 14px" }}>
+                    <span style={{ 
+                      background: "var(--bg-card)", 
+                      border: "1px solid var(--border)", 
+                      borderRadius: "20px", 
+                      padding: "5px 14px", 
+                      fontSize: "10px", 
+                      fontWeight: "600", 
+                      color: "var(--text-light)",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.01)",
+                      textTransform: "capitalize"
+                    }}>
+                      {msgDateObj ? (
+                        (() => {
+                          const today = new Date();
+                          const yesterday = new Date();
+                          yesterday.setDate(today.getDate() - 1);
+                          if (msgDateObj.toDateString() === today.toDateString()) return "Hoy";
+                          if (msgDateObj.toDateString() === yesterday.toDateString()) return "Ayer";
+                          return msgDateObj.toLocaleDateString("es-SV", { weekday: "long", day: "numeric", month: "long" });
+                        })()
+                      ) : "Mensajes anteriores"}
+                    </span>
+                  </div>
+                )}
+                <div style={{ display: "flex", justifyContent: msg.from === "client" ? "flex-start" : "flex-end", marginBottom: 4 }}>
+                  <div className="bubble" style={{
+                    background: msg.from === "client" ? "var(--bg-card)" : msg.from === "bot" ? "rgba(139, 92, 246, 0.08)" : "var(--text-main)",
+                    color: msg.from === "user" ? "var(--bg-card)" : "var(--text-main)",
+                    border: msg.from === "client" ? "1px solid var(--border)" : msg.from === "bot" ? "1px solid rgba(139, 92, 246, 0.15)" : "none",
+                    borderBottomLeftRadius: msg.from === "client" ? 4 : 14,
+                    borderBottomRightRadius: msg.from !== "client" ? 4 : 14,
+                  }}>
+                    {msg.from === "bot" && <div style={{ fontSize: 9, color: "#8b5cf6", fontWeight: 700, marginBottom: 4 }}>🤖 BOT</div>}
+                    <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{msg.texto}</div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4, fontSize: 8, marginTop: 4, color: msg.from === "user" ? "rgba(255,255,255,0.6)" : "var(--text-light)" }}>
+                      <span>{msg.tiempo}</span>
+                      {msg.from !== "client" && (
+                        <span style={{ fontSize: 10, lineHeight: 1 }}>
+                          {msg.status === "read" ? (
+                            <span style={{ color: "#3b82f6", fontWeight: "bold" }}>✓✓</span>
+                          ) : msg.status === "delivered" ? (
+                            <span>✓✓</span>
+                          ) : (
+                            <span>✓</span>
+                          )}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          });
+        })()}
         <div ref={chatEndRef} style={{ height: 1 }} />
       </div>
 
