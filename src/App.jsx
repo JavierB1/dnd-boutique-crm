@@ -169,6 +169,24 @@ const CSS = `
     width: 120px;
   }
   
+  /* Textarea expansible de chat */
+  .chat-textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: var(--text-main);
+    font-size: 13px;
+    font-family: inherit;
+    width: 100%;
+    resize: none;
+    outline: none;
+    max-height: 120px;
+    line-height: 1.4;
+    transition: all .2s;
+  }
+  .chat-textarea:focus { border-color: var(--text-muted); }
+  
   /* Burbujas de Conversación y Estructura List */
   .conv-item { padding: 14px 18px; cursor: pointer; border-bottom: 1px solid var(--border); transition: all .2s; }
   .conv-item:hover { background: var(--bg); }
@@ -404,12 +422,14 @@ export default function App() {
     const ultimo = msgs[msgs.length - 1];
     if (ultimo?.from === "user" && ultimo?.texto === texto) { setNewMsg(""); return; }
     
-    // Guardamos con marcas temporales robustas y estado de envío optimista "sent"
+    // Generamos un identificador único temporal para evitar doble mensaje en base de datos
+    const clientMsgId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const mensajes = [...msgs, { 
       from: "user", 
       texto, 
       tiempo, 
       timestamp: Date.now(), 
+      clientMsgId,
       status: "sent" 
     }];
     await setDoc(doc(db, "conversaciones", selectedPhone),
@@ -417,7 +437,7 @@ export default function App() {
     try {
       await fetch(`${BACKEND}/api/enviar`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ telefono: selectedPhone, mensaje: texto })
+        body: JSON.stringify({ telefono: selectedPhone, mensaje: texto, clientMsgId })
       });
     } catch (e) { console.error(e); }
     setNewMsg("");
@@ -996,7 +1016,9 @@ function Conversations({ conversations, convList, selectedPhone, setSelectedPhon
                       <span>{msg.tiempo}</span>
                       {msg.from !== "client" && (
                         <span style={{ fontSize: 10, lineHeight: 1 }}>
-                          {msg.status === "read" ? (
+                          {msg.status === "failed" ? (
+                            <span style={{ color: "#ef4444", fontWeight: "bold", fontSize: 11 }} title="Error al enviar: Ventana de 24 horas cerrada o número inválido">⚠️ Fallido</span>
+                          ) : msg.status === "read" ? (
                             <span style={{ color: "#3b82f6", fontWeight: "bold" }}>✓✓</span>
                           ) : msg.status === "delivered" ? (
                             <span>✓✓</span>
@@ -1016,9 +1038,25 @@ function Conversations({ conversations, convList, selectedPhone, setSelectedPhon
       </div>
 
       <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border)", display: "flex", gap: 10, background: "var(--bg-card)", flexShrink: 0 }}>
-        <input className="input" value={newMsg} onChange={e => setNewMsg(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), enviarMensaje())}
-          placeholder="Escribe un mensaje..." style={{ flex: 1 }} />
+        <textarea 
+          className="chat-textarea" 
+          rows={1}
+          value={newMsg} 
+          onChange={e => {
+            setNewMsg(e.target.value);
+            e.target.style.height = "auto";
+            e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+          }}
+          onKeyDown={e => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              enviarMensaje();
+              e.target.style.height = "auto";
+            }
+          }}
+          placeholder="Escribe un mensaje..." 
+          style={{ flex: 1, height: "42px" }} 
+        />
         <button className="btn btn-primary" onClick={enviarMensaje} style={{ paddingLeft: 18, paddingRight: 18 }}>→</button>
       </div>
     </div>
